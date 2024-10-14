@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catch the Button</title>
+  <link rel="stylesheet" href="./style.css"> <!-- 상대경로로 CSS 파일 링크 -->
+</head>
+<body>
+
+<div id="gameArea">
+  <h1>Catch the Button!</h1>
+  <button id="runawayButton">Catch Me!</button>
+  <p id="score">Score: 0</p>
+</div>
+
+<script>
+  const button = document.getElementById('runawayButton');
+  const scoreElement = document.getElementById('score');
+  let score = 0;
+  let isCaught = false;
+
+  function moveButton() {
+    const gameArea = document.getElementById('gameArea');
+    const gameWidth = gameArea.clientWidth;
+    const gameHeight = gameArea.clientHeight;
+    const buttonWidth = button.offsetWidth;
+    const buttonHeight = button.offsetHeight;
+
+    const newLeft = Math.random() * (gameWidth - buttonWidth);
+    const newTop = Math.random() * (gameHeight - buttonHeight);
+
+    button.style.left = `${newLeft}px`;
+    button.style.top = `${newTop}px`;
+    button.classList.add('move');
+  }
+
+  button.addEventListener('click', function() {
+    if (!isCaught) {
+      score++;
+      scoreElement.textContent = `Score: ${score}`;
+      button.style.backgroundColor = '#55efc4';
+      isCaught = true;
+      setTimeout(() => {
+        button.style.backgroundColor = '#ff7675';
+        isCaught = false;
+      }, 500);
+    }
+  });
+
+  document.addEventListener('mousemove', function(event) {
+    const mouseX = event.clientX;
+    const mouseY = event.clientY;
+
+    const buttonRect = button.getBoundingClientRect();
+    const buttonX = buttonRect.left + buttonRect.width / 2;
+    const buttonY = buttonRect.top + buttonRect.height / 2;
+
+    const distance = Math.sqrt(Math.pow(mouseX - buttonX, 2) + Math.pow(mouseY - buttonY, 2));
+
+    if (distance < 150 && !isCaught) {
+      moveButton();
+    }
+  });
+
+  moveButton();
+</script>
+
+</body>
+</html>
