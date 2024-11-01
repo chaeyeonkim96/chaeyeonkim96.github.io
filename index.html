@@ -1,70 +1,108 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Catch the Button</title>
-  <link rel="stylesheet" href="./style.css"> <!-- 상대경로로 CSS 파일 링크 -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>챗봇 만들기</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            text-align: center;
+            width: 400px;
+        }
+        h1 {
+            font-size: 24px;
+            color: #333;
+        }
+        .api-key-input {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .api-key-input input[type="text"] {
+            width: 80%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            background-color: #007bff; /* 파란색 상태 표시등 */
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .chatbox {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .chat-header {
+            background-color: #007bff; /* 파란색 헤더 */
+            color: white;
+            padding: 10px;
+            font-weight: bold;
+            text-align: left;
+        }
+        #chat {
+            height: 300px;
+            overflow-y: scroll;
+            padding: 10px;
+            background-color: #fff;
+            color: #333;
+            text-align: left;
+        }
+        .input-area {
+            display: flex;
+            border-top: 1px solid #ccc;
+        }
+        .input-area input[type="text"] {
+            flex-grow: 1;
+            padding: 10px;
+            border: none;
+            border-right: 1px solid #ccc;
+            outline: none;
+        }
+        .input-area button {
+            width: 60px;
+            border: none;
+            background-color: #007bff; /* 파란색 버튼 */
+            color: white;
+            cursor: pointer;
+            outline: none;
+        }
+        .input-area button:hover {
+            background-color: #0056b3; /* 조금 더 어두운 파란색 */
+        }
+        .footer {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #aaa;
+        }
+    </style>
 </head>
 <body>
-
-<div id="gameArea">
-  <h1>Catch the Button!</h1>
-  <button id="runawayButton">Catch Me!</button>
-  <p id="score">Score: 0</p>
-</div>
-
-<script>
-  const button = document.getElementById('runawayButton');
-  const scoreElement = document.getElementById('score');
-  let score = 0;
-  let isCaught = false;
-
-  function moveButton() {
-    const gameArea = document.getElementById('gameArea');
-    const gameWidth = gameArea.clientWidth;
-    const gameHeight = gameArea.clientHeight;
-    const buttonWidth = button.offsetWidth;
-    const buttonHeight = button.offsetHeight;
-
-    const newLeft = Math.random() * (gameWidth - buttonWidth);
-    const newTop = Math.random() * (gameHeight - buttonHeight);
-
-    button.style.left = `${newLeft}px`;
-    button.style.top = `${newTop}px`;
-    button.classList.add('move');
-  }
-
-  button.addEventListener('click', function() {
-    if (!isCaught) {
-      score++;
-      scoreElement.textContent = `Score: ${score}`;
-      button.style.backgroundColor = '#55efc4';
-      isCaught = true;
-      setTimeout(() => {
-        button.style.backgroundColor = '#ff7675';
-        isCaught = false;
-      }, 500);
-    }
-  });
-
-  document.addEventListener('mousemove', function(event) {
-    const mouseX = event.clientX;
-    const mouseY = event.clientY;
-
-    const buttonRect = button.getBoundingClientRect();
-    const buttonX = buttonRect.left + buttonRect.width / 2;
-    const buttonY = buttonRect.top + buttonRect.height / 2;
-
-    const distance = Math.sqrt(Math.pow(mouseX - buttonX, 2) + Math.pow(mouseY - buttonY, 2));
-
-    if (distance < 150 && !isCaught) {
-      moveButton();
-    }
-  });
-
-  moveButton();
-</script>
-
-</body>
-</html>
+    <div class="container">
+        <h1>챗봇 만들기</h1>
+        <div class="api-key-input">
+            <div class="status-indicator"></div>
+            <input type="text" placeholder="API Key를 입력하면 챗봇이 동작합니다.">
+        </div>
+        <div class="chatbox">
+            <div class="chat-header">Chatbot</div>
+            <div id="chat">
+                <div>(AI 엔진이 초기화되었습니다.) 저는 코딩 도우미입니다. 어떻게 도와드릴까요?</div>
+            </div>
+            <div class="input-area">
+                <input type="text" id="userInput" placeholder="Type your message here...">
+                <button onclick="sendMessage()">Send</button>
+ 
