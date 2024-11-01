@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>레벨 기반 반응 속도 테스트 게임</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #f5f5f5;
+      overflow: hidden;
+    }
+    h1 {
+      margin-bottom: 10px;
+      font-size: 2em;
+      font-weight: 300;
+    }
+    #startButton, #target {
+      font-size: 18px;
+      font-weight: bold;
+      color: #f5f5f5;
+      background-color: #ff5722;
+      padding: 15px 25px;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+    }
+    #startButton:hover {
+      background-color: #ff784e;
+      transform: translateY(-5px);
+    }
+    #target {
+      position: absolute;
+      display: none;
+      font-size: 1.2em;
+      letter-spacing: 0.1em;
+      background-color: #4caf50;
+      border-radius: 50%;
+      animation: pulse 1s infinite;
+    }
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+        box-shadow: 0 0 10px #4caf50, 0 0 20px #4caf50, 0 0 30px #4caf50;
+      }
+      50% {
+        transform: scale(1.1);
+      }
+      100% {
+        transform: scale(1);
+        box-shadow: 0 0 10px #4caf50, 0 0 20px #4caf50, 0 0 30px #4caf50;
+      }
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 1.2em;
+      color: #ffccbc;
+      text-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+    }
+    #level {
+      margin-top: 10px;
+      font-size: 1.1em;
+    }
+  </style>
+</head>
+<body>
+  <h1>레벨 기반 반응 속도 테스트</h1>
+  <button id="startButton">게임 시작</button>
+  <div id="target">클릭!</div>
+  <p id="result">반응 시간을 확인하세요.</p>
+  <p id="level">현재 레벨: 1</p>
+
+  <script>
+    const startButton = document.getElementById("startButton");
+    const target = document.getElementById("target");
+    const result = document.getElementById("result");
+    const levelText = document.getElementById("level");
+    let level = 1;
+    let startTime, endTime;
+    let targetTimeout;
+
+    startButton.addEventListener("click", startGame);
+
+    function startGame() {
+      level = 1;
+      updateLevelText();
+      startButton.style.display = "none";
+      result.textContent = "타겟이 나타나면 빠르게 클릭하세요!";
+      showTarget();
+    }
+
+    function showTarget() {
+      const randomDelay = Math.random() * (3000 - level * 200) + 1000;
+      clearTimeout(targetTimeout);
+
+      targetTimeout = setTimeout(() => {
+        const x = Math.random() * (window.innerWidth - 100);
+        const y = Math.random() * (window.innerHeight - 100);
+        target.style.left = `${x}px`;
+        target.style.top = `${y}px`;
+        target.style.width = `${Math.max(100 - level * 10, 30)}px`;
+        target.style.height = `${Math.max(100 - level * 10, 30)}px`;
+        target.style.display = "inline-block";
+        startTime = new Date().getTime();
+        
+        // 타겟 시간 초과 시 게임 종료
+        targetTimeout = setTimeout(() => {
+          if (target.style.display === "inline-block") {
+            endGame("시간 초과! 다시 도전하세요.");
+          }
+        }, 2000 - level * 100); // 레벨이 높아질수록 반응 시간이 짧아짐
+      }, randomDelay);
+    }
+
+    target.addEventListener("click", () => {
+      endTime = new Date().getTime();
+      const reactionTime = endTime - startTime;
+      target.style.display = "none";
+
+      if (reactionTime < 2000 - level * 100) { // 레벨에 따라 제한 시간을 설정
+        result.textContent = `레벨 ${level} 성공! 반응 시간: ${reactionTime} ms`;
+        level++;
+        updateLevelText();
+        showTarget();
+      } else {
+        endGame("시간 초과! 다시 도전하세요.");
+      }
+    });
+
+    function updateLevelText() {
+      levelText.textContent = `현재 레벨: ${level}`;
+    }
+
+    function endGame(message) {
+      clearTimeout(targetTimeout);
+      target.style.display = "none";
+      startButton.style.display = "inline-block";
+      result.textContent = message;
+      level = 1;
+      updateLevelText();
+    }
+  </script>
+</body>
+</html>
